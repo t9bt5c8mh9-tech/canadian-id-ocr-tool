@@ -10,7 +10,7 @@ _DATE_RE = re.compile(
     r"(\d{4}[-/ ]\d{2}[-/ ]\d{2}|\d{2}[-/]\d{2}[-/]\d{4}|\d{1,2} [A-Za-z]{3} \d{4}|[A-Za-z]{3} \d{1,2},? \d{4})"
 )
 _LICENSE_LABEL_RE = re.compile(
-    r"(?:licen[sc]e|licence|permis|dl|id)\s*(?:no\.?|number|num|#|n[o°])?\s*[:#]?\s*([A-Z0-9][A-Z0-9 \-]{4,20})", re.I
+    r"\b(?:licen[sc]e|permis|dl|id)\b\s*(?:no\.?|number|num|#|n[o°])?\s*[:#]?\s*([A-Z0-9][A-Z0-9 \-]{4,20})", re.I
 )
 _LICENSE_LOOSE_RE = re.compile(r"\b([A-Z]\d{4}[- ]?\d{5}[- ]?\d{5})\b")
 

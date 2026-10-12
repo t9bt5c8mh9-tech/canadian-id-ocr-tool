@@ -47,3 +47,8 @@ def test_postal_province_fallback():
 def test_merge():
     m = de.merge_results({"name": "A", "errors": ["x"]}, {"name": "B", "address": "C", "errors": ["x"]})
     assert m["name"] == "A" and m["address"] == "C" and m["errors"] == ["x"]
+
+
+def test_valid_until_not_license():
+    d = de.extract_fields("Valid until 2099-05-17\nName: A B")
+    assert d["license_number"] is None
