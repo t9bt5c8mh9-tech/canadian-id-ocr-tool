@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image2PSD</title>
+  <meta name="description" content="Convert images to layered Photoshop PSD files, right in your browser. No uploads — everything runs locally.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Image2PSD</h1>
+    <p class="tagline">Convert PNG, JPG, GIF, WebP or BMP images into Photoshop PSD files — entirely in your browser. Nothing is uploaded.</p>
+  </header>
+
+  <main>
+    <form id="image-form" onsubmit="return false">
+      <label class="file-drop">
+        <input type="file" id="image-input" accept="image/*">
+        <span>Choose an image…</span>
+      </label>
+      <button type="button" id="convert-button">Convert to PSD</button>
+    </form>
+
+    <p id="status" role="status"></p>
+
+    <section id="psd-editor" aria-label="Preview">
+      <canvas id="preview-canvas"></canvas>
+      <p id="image-info"></p>
+    </section>
+
+    <section id="layer-list" aria-label="Layers">
+      <h2>Layers in the exported PSD</h2>
+      <ul>
+        <li>One editable raster layer containing your image</li>
+        <li>A flattened composite for maximum compatibility</li>
+      </ul>
+    </section>
+
+    <section id="font-list" aria-label="Fonts">
+      <h2>Fonts</h2>
+      <p>Not applicable — this tool converts a whole image. Text inside the
+         image is baked into the pixels, not stored as editable text.</p>
+    </section>
+
+    <section id="layout-options" aria-label="Layout">
+      <h2>Layout</h2>
+      <p>The PSD keeps the image's original dimensions and pixels, 8&nbsp;bits
+         per channel, RGB colour. Transparency is preserved unless you pick a
+         background colour below.</p>
+    </section>
+
+    <fieldset id="auto-correction-options">
+      <legend>Auto-correction options</legend>
+      <label><input type="checkbox" id="opt-auto-contrast"> Auto contrast stretch</label>
+      <label><input type="checkbox" id="opt-grayscale"> Convert to grayscale</label>
+      <label><input type="checkbox" id="opt-trim-transparent" checked>
+        Layer trimmed to non-transparent content</label>
+      <label>
+        Background for transparent areas:
+        <select id="opt-background">
+          <option value="keep" selected>Keep transparency</option>
+          <option value="#ffffff">White</option>
+          <option value="#000000">Black</option>
+        </select>
+      </label>
+      <label>
+        Max output dimension:
+        <select id="opt-max-dimension">
+          <option value="0" selected>No limit</option>
+          <option value="30000">30000 px (PSD max)</option>
+          <option value="8192">8192 px</option>
+          <option value="4096">4096 px</option>
+        </select>
+      </label>
+    </fieldset>
+
+    <button type="button" id="export-button" disabled>Export PSD</button>
+  </main>
+
+  <footer>
+    <p>Runs 100% client-side. Output is a PSD v1 file (8-bit RGB/RGBA,
+       PackBits RLE) compatible with Photoshop, GIMP, Photopea and most
+       editors.</p>
+  </footer>
+
+  <script src="psd-encoder.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

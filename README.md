@@ -36,3 +36,25 @@ These adjustments only help OCR read the image; the tool does not alter ID conte
 - `--review` (and the GUI) opens a window to correct extracted fields before the PDF is generated.
 
 ![Ontario specimen](samples/ontario_specimen.png)
+
+## Image2PSD web app (PSD Forge)
+
+This repository also contains a separate, standalone web tool that converts
+images (PNG, JPG, GIF, WebP, BMP) into layered Photoshop PSD files. It runs
+entirely in the browser — no uploads, no dependencies, no build step:
+
+- `index.html` / `styles.css` – the UI
+- `script.js` – loading, preview, auto-correction options, export
+- `psd-encoder.js` – dependency-free PSD v1 writer (8-bit RGB/RGBA, PackBits RLE)
+
+### Run locally
+Serve the repo root with any static server, e.g. `python -m http.server`,
+then open `http://localhost:8000/` (opening `index.html` directly also works).
+
+### Deploy to Cloudflare Pages
+The repo includes `wrangler.toml` and `.assetsignore` (which excludes the
+Python OCR tool files from the deployment), so this works as-is:
+
+```
+npx wrangler pages deploy . --project-name psd-forge
+```
