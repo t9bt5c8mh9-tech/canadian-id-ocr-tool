@@ -8,6 +8,7 @@ import config
 import data_extractor
 import ocr_processor
 import pdf_generator
+import specimen_generator
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,27 @@ def collect_sources(paths):
     return out
 
 
+def review_fields(data):
+    """Show a dialog to correct extracted fields; returns the corrected data."""
+    import tkinter as tk
+
+    win = tk.Tk()
+    win.title("Review extracted fields")
+    entries = {}
+    for i, f in enumerate(data_extractor.FIELDS):
+        tk.Label(win, text=f).grid(row=i, column=0, sticky="w", padx=6, pady=2)
+        e = tk.Entry(win, width=50)
+        e.insert(0, data.get(f) or "")
+        e.grid(row=i, column=1, padx=6, pady=2)
+        entries[f] = e
+    tk.Button(win, text="Done", command=win.quit).grid(row=len(entries), column=1, sticky="e", pady=6)
+    win.mainloop()
+    fixed = {f: (e.get().strip() or None) for f, e in entries.items()}
+    win.destroy()
+    fixed["errors"] = data_extractor.validate_fields(fixed)
+    return fixed
+
+
 def run_gui():
     import tkinter as tk
     from tkinter import filedialog, messagebox, simpledialog
@@ -74,6 +96,10 @@ def run_gui():
     if len(files) == 2:
         merged = data_extractor.merge_results(results[0][1], results[1][1])
         results = [(" + ".join(files), merged)]
+    root.destroy()
+    results = [(src, review_fields(data)) for src, data in results]
+    root = tk.Tk()
+    root.withdraw()
     out = filedialog.asksaveasfilename(title="Save PDF report", defaultextension=".pdf",
                                        filetypes=[("PDF", "*.pdf")])
     if out:
@@ -92,9 +118,15 @@ def main(argv=None):
     parser.add_argument("--crop", type=int, nargs=4, metavar=("L", "T", "R", "B"), help="crop box in pixels")
     parser.add_argument("--brightness", type=float, default=1.0)
     parser.add_argument("--contrast", type=float, default=1.0)
+    parser.add_argument("--make-specimen", metavar="PATH", help="write a SPECIMEN-marked fake test card and exit")
+    parser.add_argument("--review", action="store_true", help="review/correct extracted fields in a window before reporting")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
     config.setup_logging(logging.DEBUG if args.verbose else logging.INFO)
+
+    if args.make_specimen:
+        print(specimen_generator.generate_specimen(args.make_specimen))
+        return 0
 
     if not args.inputs:
         try:
@@ -114,6 +146,8 @@ def main(argv=None):
             return 1
     else:
         results = process_batch(sources, edits, args.save_images)
+    if args.review:
+        results = [(src, review_fields(data)) for src, data in results]
     for src, data in results:
         print(src)
         for f in data_extractor.FIELDS:
