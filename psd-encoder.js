@@ -140,7 +140,7 @@
       planes.push(l.b); ids.push(2);
       var blocks = [];
       for (var p = 0; p < planes.length; p++) {
-        blocks.push(buildChannelImageData(planes[p], l.width, l.height));
+        blocks.push(buildChannelImageData([planes[p]], l.width, l.height));
       }
       channelSets.push({ ids: ids, blocks: blocks });
     }
