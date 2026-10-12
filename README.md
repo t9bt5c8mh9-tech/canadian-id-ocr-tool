@@ -34,3 +34,5 @@ These adjustments only help OCR read the image; the tool does not alter ID conte
 - `python main.py --make-specimen sample.png` writes a fake test card. It is always stamped "SPECIMEN" (diagonal stamp
   and text in the empty areas); the marking cannot be disabled.
 - `--review` (and the GUI) opens a window to correct extracted fields before the PDF is generated.
+
+![Ontario specimen](samples/ontario_specimen.png)
