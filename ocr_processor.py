@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import pytesseract
 import requests
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageEnhance, UnidentifiedImageError
 
 import config
 
@@ -74,8 +74,52 @@ def extract_text(image):
         raise OCRError(f"OCR failed: {exc}") from exc
 
 
-def process_source(source):
-    """OCR a file path or URL."""
+def edit_image(image, rotate=0, crop=None, brightness=1.0, contrast=1.0):
+    """Apply scan-quality adjustments (rotate, crop, brightness, contrast).
+
+    `crop` is a (left, upper, right, lower) pixel box. Returns a new image.
+    """
+    if crop:
+        left, upper, right, lower = crop
+        if not (0 <= left < right <= image.width and 0 <= upper < lower <= image.height):
+            raise OCRError(f"Invalid crop box {crop} for image size {image.size}")
+        image = image.crop(crop)
+    if rotate:
+        image = image.rotate(-rotate, expand=True, fillcolor=(255, 255, 255))
+    if brightness != 1.0:
+        image = ImageEnhance.Brightness(image).enhance(brightness)
+    if contrast != 1.0:
+        image = ImageEnhance.Contrast(image).enhance(contrast)
+    return image
+
+
+def save_image(image, path):
+    """Save an image (format chosen from the extension); returns the path."""
+    ext = os.path.splitext(path)[1].lower()
+    if ext not in config.SUPPORTED_EXTENSIONS:
+        raise OCRError(f"Unsupported output format: {ext or path}")
+    try:
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        image.save(path)
+    except OSError as exc:
+        raise OCRError(f"Cannot save image {path}: {exc}") from exc
+    logger.info("Saved image to %s", path)
+    return path
+
+
+def get_image(source):
+    """Load an image from a file path or URL."""
+    if source.lower().startswith(("http://", "https://")):
+        return download_image(source)
+    return load_image(source)
+
+
+def process_source(source, edits=None, save_to=None):
+    """OCR a file path or URL, optionally editing and saving the image first."""
     logger.info("Processing %s", source)
-    image = download_image(source) if source.lower().startswith(("http://", "https://")) else load_image(source)
+    image = get_image(source)
+    if edits:
+        image = edit_image(image, **edits)
+    if save_to:
+        save_image(image, save_to)
     return extract_text(image)

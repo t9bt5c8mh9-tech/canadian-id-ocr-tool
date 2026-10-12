@@ -23,3 +23,9 @@ province from photos of Canadian driver's licences and provincial ID cards.
 
 Supported formats: PNG, JPG, BMP, TIFF, WEBP. Logs go to the console and `id_ocr.log`.
 OCR output is imperfect: review extracted values and warnings. Handle ID images as sensitive personal data.
+
+## Downloading and adjusting images
+URLs are downloaded automatically. Use `--save-images DIR` to keep the downloaded (and adjusted) image, and
+`--rotate DEG`, `--crop L T R B`, `--brightness X`, `--contrast X` to improve scan quality before OCR, e.g.
+`python main.py https://example.com/id.jpg --rotate 90 --contrast 1.4 --save-images ./imgs`.
+These adjustments only help OCR read the image; the tool does not alter ID content.

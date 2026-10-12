@@ -37,3 +37,15 @@ def test_pdf(tmp_path):
     out = tmp_path / "sub" / "r.pdf"
     pdf_generator.generate_report([("x.png", {"name": "José Ünder", "province": "ON", "errors": ["bad"]})], str(out))
     assert out.read_bytes().startswith(b"%PDF")
+
+
+def test_edit_and_save(tmp_path):
+    img = Image.new("RGB", (100, 50), (120, 120, 120))
+    out = ocr_processor.edit_image(img, rotate=90, crop=(0, 0, 50, 50), contrast=1.5)
+    assert out.size == (50, 50)
+    with pytest.raises(ocr_processor.OCRError):
+        ocr_processor.edit_image(img, crop=(0, 0, 500, 50))
+    p = ocr_processor.save_image(img, str(tmp_path / "d" / "x.png"))
+    assert ocr_processor.load_image(p).size == (100, 50)
+    with pytest.raises(ocr_processor.OCRError):
+        ocr_processor.save_image(img, str(tmp_path / "x.exe"))
