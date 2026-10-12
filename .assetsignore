@@ -1,0 +1,14 @@
+# Files excluded from the Cloudflare Pages deployment
+# (the site only needs index.html, styles.css, script.js, psd-encoder.js).
+*.py
+requirements.txt
+.git
+.github
+.pytest_cache
+__pycache__
+samples
+tests
+id_ocr.log
+*.log
+wrangler.toml
+.assetsignore
