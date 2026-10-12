@@ -36,3 +36,8 @@ These adjustments only help OCR read the image; the tool does not alter ID conte
 - `--review` (and the GUI) opens a window to correct extracted fields before the PDF is generated.
 
 ![Ontario specimen](samples/ontario_specimen.png)
+
+## Reference templates
+`samples/` holds realistic licence images downloaded from the internet (official government "SAMPLE" fronts and a
+PDF417-style back) used as size/layout reference for the specimen generator and tests. See
+[samples/README.md](samples/README.md) for sources. No real person's ID is stored in this repository.

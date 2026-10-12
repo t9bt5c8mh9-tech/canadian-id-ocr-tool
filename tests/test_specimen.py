@@ -21,3 +21,26 @@ def test_specimen_bad_format(tmp_path):
 def test_cli_specimen(tmp_path):
     out = tmp_path / "c.png"
     assert main.main(["--make-specimen", str(out)]) == 0 and out.exists()
+
+
+def test_reference_templates_exist():
+    for name in sg.REFERENCE_IMAGES:
+        path = sg.reference_image(name)
+        img = Image.open(path)
+        img.load()
+        assert img.width >= 600 and img.height >= 400
+
+
+def test_reference_fronts_are_jpeg():
+    fronts = [n for n in sg.REFERENCE_IMAGES if "front" in n]
+    assert fronts, "at least one downloaded front template is expected"
+    for name in fronts:
+        with open(sg.reference_image(name), "rb") as fh:
+            assert fh.read(2) == b"\xff\xd8"  # JPEG magic bytes
+
+
+def test_reference_back_has_barcode_band():
+    img = Image.open(sg.reference_image(sg.REFERENCE_IMAGES[-1])).convert("L")
+    # the barcode area must contain both dark bars and light gaps
+    band = list(img.crop((80, 120, 900, 350)).getdata())
+    assert min(band) < 60 and max(band) > 200
